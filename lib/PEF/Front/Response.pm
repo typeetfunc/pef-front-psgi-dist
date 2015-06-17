@@ -7,8 +7,8 @@ use Encode;
 use utf8;
 use URI::Escape;
 use URI;
-use POSIX 'strftime';
 use PEF::Front::Headers;
+use DateTime;
 
 sub new {
 	my ($class, %args) = @_;
@@ -123,7 +123,8 @@ sub content_type {
 
 sub expires {
 	my $expires = eval { parse_duration($_[0]) } || 0;
-	return strftime("%a, %d-%b-%Y %H:%M:%S GMT", gmtime (time + $expires));
+	my $expires_datetime = DateTime->from_epoch(epoch => time + $expires);
+	return $expires_datetime->strftime("%a, %d-%b-%Y %H:%M:%S GMT");
 }
 
 sub safe_encode_utf8 {

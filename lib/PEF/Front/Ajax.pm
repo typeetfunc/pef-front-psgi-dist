@@ -25,6 +25,13 @@ sub ajax {
 	my $src           = $defaults->{src};
 	$request{method} = $defaults->{method};
 	$http_response->set_cookie(lang => {value => $lang, path => "/"});
+	my $session = PEF::Front::Session->new($request);
+	$http_response->set_cookie(
+		cfg_session_request_field() => {
+			value => $session->key, 
+			path => "/",
+			expires => cfg_session_ttl + time
+		}) if cfg_session_always_set and not exists $cookies->{cfg_session_request_field()};		
 	my $vreq = eval { validate(\%request, $defaults) };
 	my $response;
 	my $json = $src eq 'ajax';

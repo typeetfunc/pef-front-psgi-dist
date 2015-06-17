@@ -22,14 +22,15 @@ sub _expires () { 0 }
 sub _data ()    { 1 }
 
 sub new {
-	my ($class, $request) = @_;
+	my ($class, $request) = @_;	
 	my $key = (
-		blessed($request) ? $request->param(cfg_session_request_field())
+		blessed($request) ? ($request->param(cfg_session_request_field()) || $request->note(cfg_session_request_field))
 		  || $request->cookies->{cfg_session_request_field()}
 		: ref ($request) ? $request->{cfg_session_request_field()}
 		:                  $request
 	);
-	$key ||= _secure_value;
+	$key ||= _secure_value;	
+	$request->note(cfg_session_request_field, $key) if blessed($request);
 	my $self = bless [$key, [time + cfg_session_ttl, {}]], $class;
 	$self->load;
 	$self;

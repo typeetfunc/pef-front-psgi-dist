@@ -22,6 +22,13 @@ sub handler {
 	my $http_response = PEF::Front::Response->new(base => $request->base);
 	my $lang          = $defaults->{lang};
 	$http_response->set_cookie(lang => {value => $lang, path => "/"});
+	my $session = PEF::Front::Session->new($request);
+	$http_response->set_cookie(
+		cfg_session_request_field() => {
+			value => $session->key, 
+			path => "/",
+			expires => cfg_session_ttl + time
+		}) if cfg_session_always_set and not exists $cookies->{cfg_session_request_field()};
 	my $template = delete $defaults->{method};
 	$template =~ tr/ /_/;
 	my $template_file = "$template.html";
@@ -55,7 +62,7 @@ sub handler {
 				$method = $_;
 			}
 		}
-		$req{method} = $method if defined $method;
+		$req{method} = $method if defined $method;		
 		my $vreq = eval { validate(\%req, $defaults) };
 		my $response;
 		if (!$@) {

@@ -25,7 +25,7 @@ WriteMakefile(
 		'Locale::PO'            => 0,
 		'MLDBM'                 => 0,
 		'MLDBM::Sync'           => "0.30",
-		'POSIX'                 => 0,
+		'DateTime'              => 0,
 		'Regexp::Common'        => 0,
 		'Socket'                => 0,
 		'Storable'              => 0,

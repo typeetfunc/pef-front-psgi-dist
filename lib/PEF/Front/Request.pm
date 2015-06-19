@@ -7,6 +7,7 @@ use utf8;
 use Encode;
 use PEF::Front::Headers;
 use PEF::Front::File;
+use PEF::Front::Config;
 use XML::Simple;
 use URI;
 
@@ -42,8 +43,9 @@ sub user_agent       { $_[0]->headers->get_header("user_agent") }
 
 sub logger {
 	my $self = $_[0];
-	$self->{env}{'psgix.logger'}
-	  || sub { $self->{env}{'psgi.errors'}->print($_[0]->{message}); }
+	cfg_logger($self);
+	#$self->{env}{'psgix.logger'}
+	#  || sub { $self->{env}{'psgi.errors'}->print($_[0]->{message}); }
 }
 
 sub _parse {

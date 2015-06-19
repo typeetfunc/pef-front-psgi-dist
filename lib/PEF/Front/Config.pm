@@ -72,6 +72,7 @@ my @std_var_params = qw{
   cfg_oauth_client_id
   cfg_oauth_client_secret
   cfg_oauth_scopes
+  cfg_logger
 };
 
 our %config_export;
@@ -250,6 +251,13 @@ sub std_oauth_scopes {
 	};
 	$scopes->{$_[0]};
 }
+
+sub std_logger {
+	my ($request) = shift;
+	$request->{env}{'psgix.logger'}
+	  || sub { $request->{env}{'psgi.errors'}->print($_[0]->{message}); }
+}
+
 
 sub cfg {
 	my $key     = $_[0];

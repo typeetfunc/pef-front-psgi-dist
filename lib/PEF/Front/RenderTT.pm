@@ -27,7 +27,7 @@ sub handler {
 	my $session = PEF::Front::Session->new($request);
 	$http_response->set_cookie(
 		cfg_session_request_field() => {
-			value => $session->key, 
+			value => $session->key,
 			path => "/",
 			expires => cfg_session_ttl + time
 		}) if cfg_session_always_set and not exists $cookies->{cfg_session_request_field()};
@@ -64,7 +64,7 @@ sub handler {
 				$method = $_;
 			}
 		}
-		$req{method} = $method if defined $method;		
+		$req{method} = $method if defined $method;
 		my $vreq = eval { validate(\%req, $defaults) };
 		my $response;
 		if (!$@) {
@@ -85,18 +85,12 @@ sub handler {
 			my $cache_attr = get_method_attrs($vreq => 'cache');
 			my $cache_key;
 			if ($cache_attr) {
-				$cache_attr = {key => 'method', expires => $cache_attr} if not ref $cache_attr;
-				my @keys;
-				if (ref ($cache_attr->{key}) eq 'ARRAY') {
-					@keys = grep { exists $vreq->{$_} } @{$cache_attr->{key}};
-				} elsif (not exists $cache_attr->{key}) {
-					@keys = ('method');
-				} else {
-					@keys = ($cache_attr->{key});
-				}
+				$cache_attr = {key => cfg_cache_method_key, expires => $cache_attr} if not ref $cache_attr;
+				$cache_attr->{key}     = cfg_cache_method_key
+				  unless exists $cache_attr->{key};
 				$cache_attr->{expires} = cfg_cache_method_expire
 				  unless exists $cache_attr->{expires};
-				$cache_key = join (":", @{$vreq}{@keys});
+				$cache_key = make_cache_key_from_req($vreq, $cache_attr->{key});
 				cfg_log_level_debug
 				  && $logger->({level => "debug", message => "cache key: $cache_key"});
 				$response = get_cache("ajax:$cache_key");
